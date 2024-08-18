@@ -1,8 +1,8 @@
 # Scripts to download or generate data
-import config
 import os
 import tarfile
 import urllib.request
+import pandas as pd
 
 
 def fetch_housing_data(housing_url, housing_path):
@@ -14,7 +14,13 @@ def fetch_housing_data(housing_url, housing_path):
     housing_tgz.close()
 
 
+def load_housing_data(housing_path):
+    return pd.read_csv(housing_path)
+
+
 def main():
+    import config
+
     DOWNLOAD_ROOT = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
     HOUSING_PATH = config.PATH_DATA_RAW
     HOUSING_URL = DOWNLOAD_ROOT + "datasets/housing/housing.tgz"
