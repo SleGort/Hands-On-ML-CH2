@@ -1,7 +1,9 @@
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
-import matplotlib.pyplot as plt
+from sklearn.impute import SimpleImputer
+from sklearn.model_selection import StratifiedShuffleSplit
+
 from src import config
 from src.dataset import load_housing_data
 
@@ -57,3 +59,15 @@ quirk_values = [500001, 500000, 450000, 350000, 280000]
 housing_filtered = housing_stratified[
     ~housing_stratified["median_house_value"].isin(quirk_values)
 ]
+
+X = strat_train_set.drop("median_house_value", axis=1)
+y = strat_train_set["median_house_value"].copy()
+
+X_num = X.drop("ocean_proximity", axis=1)
+
+
+imputer = SimpleImputer(strategy="median")
+imputer.fit(X_num)
+
+
+X_tr = pd.DataFrame(imputer.transform(X_num), columns=X_num.columns, index=X_num.index)
