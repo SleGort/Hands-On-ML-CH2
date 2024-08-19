@@ -27,6 +27,7 @@ for set_ in (strat_train_set, strat_test_set):
 
 #! Saving the test set as csv
 strat_test_set.to_csv(config.project_root / "data" / "test_set.csv")
+
 housing_stratified = strat_train_set.copy()
 
 housing_stratified.plot(
@@ -42,3 +43,17 @@ housing_stratified.plot(
     colorbar=True,
 )
 plt.legend()
+
+housing_stratified.plot(
+    kind="scatter", x="median_income", y="median_house_value", alpha=0.1
+)
+
+# Identify and filter out the quirk values
+quirk_values = [500001, 500000, 450000, 350000, 280000]
+
+# Filter the DataFrame to remove rows with these quirk values
+# ? This is the logical NOT operator, which inverts the boolean values,
+# ? so it selects rows where median_house_value is NOT in quirk_values.
+housing_filtered = housing_stratified[
+    ~housing_stratified["median_house_value"].isin(quirk_values)
+]
