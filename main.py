@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split, StratifiedShuffleSplit
-
+import matplotlib.pyplot as plt
 from src import config
 from src.dataset import load_housing_data
 
@@ -24,3 +24,21 @@ for train_index, test_index in split.split(housing, housing["income_cat"]):
 
 for set_ in (strat_train_set, strat_test_set):
     set_.drop("income_cat", axis=1, inplace=True)
+
+#! Saving the test set as csv
+strat_test_set.to_csv(config.project_root / "data" / "test_set.csv")
+housing_stratified = strat_train_set.copy()
+
+housing_stratified.plot(
+    kind="scatter",
+    x="longitude",
+    y="latitude",
+    alpha=0.4,
+    s=housing_stratified["population"] / 100,
+    label="population",
+    figsize=(10, 7),
+    c="median_house_value",
+    cmap=plt.get_cmap("jet"),
+    colorbar=True,
+)
+plt.legend()
