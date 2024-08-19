@@ -13,3 +13,6 @@ PATH_DATA_RAW = project_root / "data" / "raw"
 PATH_MODELING = project_root / "src" / "modeling"
 PATH_SERVICES = project_root / "src" / "services"
 PATH_FIGURES = project_root / "reports" / "figures"
+
+RANDOM_SEED = 42
+TEST_SIZE = 0.2
