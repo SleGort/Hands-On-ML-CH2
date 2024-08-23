@@ -1,7 +1,3 @@
-# Machine Learning Model Training and Inference
-
-This project is designed to facilitate the training, evaluation, and deployment of machine learning models. The project is structured to allow easy data preprocessing, model training, and model inference. 
-
 ## Project Structure
 
 ```
