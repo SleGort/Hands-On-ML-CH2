@@ -1,5 +1,6 @@
 # Scripts to download or generate data
 import os
+import sys
 import tarfile
 import urllib.request
 from pathlib import Path
@@ -26,7 +27,7 @@ def check_and_load_data(data_path):
         print(f"Data found at {data_path}.")
         return True
     else:
-        print(f"Data not found at {data_path}. Loading data...")
+        print(f"Data not found at {data_path}. Attempting to load data...")
         main()
 
         # Check again if the data was successfully loaded
@@ -34,8 +35,8 @@ def check_and_load_data(data_path):
             print(f"Data successfully loaded and found at {data_path}.")
             return True
         else:
-            print(f"Failed to load data to {data_path}.")
-            return False
+            print(f"Failed to load data to {data_path}. Exiting program.")
+            sys.exit(1)  # Exits the program with a status code of 1 indicating an error
 
 
 def fetch_housing_data(housing_url, housing_path):
