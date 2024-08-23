@@ -1,13 +1,19 @@
+from datetime import datetime
+
 from src import config
 from src.dataset import check_and_load_data, load_housing_data
-from src.modeling.train import train_model, prepare_data
 from src.modeling.predict import (
-    save_model,
-    load_model,
     calculate_rmse,
-    confidence_interval_t_score,
     confidence_interval_bootstrap,
+    confidence_interval_t_score,
+    load_model,
+    save_model,
 )
+from src.modeling.train import prepare_data, train_model
+
+# Get the current local time
+current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 
 data_path = config.project_root / "data" / "housing.csv"
 if check_and_load_data(data_path):
@@ -21,7 +27,12 @@ quirk_values = [500001, 500000, 450000, 350000, 280000]
 
 X_train, y_train, X_test, y_test = prepare_data(housing, quirk_values)
 
+print(f"[{current_time}] Started training model")
+
 model = train_model(X_train, y_train)
+
+print(f"[{current_time}] Model training finished")
+
 save_model(model, config.project_root / "models" / "RF_model.pkl")
 
 model_loaded = load_model(config.project_root / "models" / "RF_model.pkl")

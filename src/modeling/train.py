@@ -7,7 +7,9 @@ from sklearn.model_selection import GridSearchCV, StratifiedShuffleSplit
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-from features import CombinedAttributesAdder, ImportantAttributesSelector
+# sys.path.append(os.path.dirname(os.getcwd()))
+
+from ..features import CombinedAttributesAdder, ImportantAttributesSelector
 
 # Define column names for numerical and categorical data
 col_names = [

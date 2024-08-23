@@ -2,7 +2,11 @@
 import os
 import tarfile
 import urllib.request
+from pathlib import Path
+
 import pandas as pd
+
+from . import config
 
 
 def check_and_load_data(data_path):
@@ -10,12 +14,15 @@ def check_and_load_data(data_path):
     Checks if the data exists at the specified location. If not, calls the main() function to load the data.
 
     Args:
-    - data_path: The path where the data should be located.
+    - data_path: The path where the data should be located. Can be a string or a Path object.
 
     Returns:
     - Boolean: True if data exists after the function, False otherwise.
     """
-    if os.path.exists(data_path):
+    # Ensure data_path is a Path object
+    data_path = Path(data_path)
+
+    if data_path.exists():
         print(f"Data found at {data_path}.")
         return True
     else:
@@ -23,7 +30,7 @@ def check_and_load_data(data_path):
         main()
 
         # Check again if the data was successfully loaded
-        if os.path.exists(data_path):
+        if data_path.exists():
             print(f"Data successfully loaded and found at {data_path}.")
             return True
         else:
@@ -45,8 +52,6 @@ def load_housing_data(housing_path):
 
 
 def main():
-    import config
-
     DOWNLOAD_ROOT = "https://raw.githubusercontent.com/ageron/handson-ml2/master/"
     HOUSING_PATH = config.PATH_DATA_RAW
     HOUSING_URL = DOWNLOAD_ROOT + "datasets/housing/housing.tgz"
