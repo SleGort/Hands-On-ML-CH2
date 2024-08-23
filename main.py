@@ -1,73 +1,39 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from sklearn.impute import SimpleImputer
-from sklearn.model_selection import StratifiedShuffleSplit
-
 from src import config
 from src.dataset import load_housing_data
+from src.modeling.train import train_model, prepare_data
+from src.modeling.predict import (
+    save_model,
+    load_model,
+    calculate_rmse,
+    confidence_interval_t_score,
+    confidence_interval_bootstrap,
+)
 
 seed = config.RANDOM_SEED = 42
 test_size = config.TEST_SIZE = 0.2
 
+
 housing = load_housing_data(config.PATH_DATA_RAW / "housing.csv")
 
-# * Using income categories to create stratified random sample for the test set
-housing["income_cat"] = pd.cut(
-    housing["median_income"],
-    bins=[0.0, 1.5, 3.0, 4.5, 6.0, np.inf],
-    labels=[1, 2, 3, 4, 5],
-)
-
-split = StratifiedShuffleSplit(n_splits=1, test_size=test_size, random_state=seed)
-for train_index, test_index in split.split(housing, housing["income_cat"]):
-    strat_train_set = housing.loc[train_index]
-    strat_test_set = housing.loc[test_index]
-
-for set_ in (strat_train_set, strat_test_set):
-    set_.drop("income_cat", axis=1, inplace=True)
-
-#! Saving the test set as csv
-strat_test_set.to_csv(config.project_root / "data" / "test_set.csv")
-
-housing_stratified = strat_train_set.copy()
-
-housing_stratified.plot(
-    kind="scatter",
-    x="longitude",
-    y="latitude",
-    alpha=0.4,
-    s=housing_stratified["population"] / 100,
-    label="population",
-    figsize=(10, 7),
-    c="median_house_value",
-    cmap=plt.get_cmap("jet"),
-    colorbar=True,
-)
-plt.legend()
-
-housing_stratified.plot(
-    kind="scatter", x="median_income", y="median_house_value", alpha=0.1
-)
-
-# Identify and filter out the quirk values
 quirk_values = [500001, 500000, 450000, 350000, 280000]
 
-# Filter the DataFrame to remove rows with these quirk values
-# ? This is the logical NOT operator, which inverts the boolean values,
-# ? so it selects rows where median_house_value is NOT in quirk_values.
-housing_filtered = housing_stratified[
-    ~housing_stratified["median_house_value"].isin(quirk_values)
-]
+X_train, y_train, X_test, y_test = prepare_data(housing, quirk_values)
 
-X = strat_train_set.drop("median_house_value", axis=1)
-y = strat_train_set["median_house_value"].copy()
+model = train_model(X_train, y_train)
+save_model(model, config.project_root / "models" / "RF_model.pkl")
 
-X_num = X.drop("ocean_proximity", axis=1)
+model_loaded = load_model(config.project_root / "models" / "RF_model.pkl")
 
+y_test_predictions = model_loaded.predict(X_test)
 
-imputer = SimpleImputer(strategy="median")
-imputer.fit(X_num)
+# Calculate RMSE
+rmse = calculate_rmse(y_test, y_test_predictions)
+print(f"RMSE: {rmse}")
 
+# Calculate confidence interval using t-score
+t_score_interval = confidence_interval_t_score(y_test, y_test_predictions)
+print(f"95% confidence interval for RMSE using t-distribution: {t_score_interval}")
 
-X_tr = pd.DataFrame(imputer.transform(X_num), columns=X_num.columns, index=X_num.index)
+# Calculate confidence interval using bootstrap
+bootstrap_interval = confidence_interval_bootstrap(y_test, y_test_predictions)
+print(f"(Bootstrapped) 95% confidence interval for RMSE: {bootstrap_interval}")
