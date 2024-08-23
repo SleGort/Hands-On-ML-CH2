@@ -1,5 +1,5 @@
 from src import config
-from src.dataset import load_housing_data
+from src.dataset import check_and_load_data, load_housing_data
 from src.modeling.train import train_model, prepare_data
 from src.modeling.predict import (
     save_model,
@@ -9,9 +9,11 @@ from src.modeling.predict import (
     confidence_interval_bootstrap,
 )
 
-seed = config.RANDOM_SEED = 42
-test_size = config.TEST_SIZE = 0.2
-
+data_path = config.project_root / "data" / "housing.csv"
+if check_and_load_data(data_path):
+    print("Data is ready for processing.")
+else:
+    print("Data loading failed. Please check the dataset.py script.")
 
 housing = load_housing_data(config.PATH_DATA_RAW / "housing.csv")
 
